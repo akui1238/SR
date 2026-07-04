@@ -1,0 +1,42 @@
+mport numpy as np
+import math
+import argparse
+
+def mse(imageA, imageB):
+    # 计算两个图像的均方误差（MSE）
+    err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
+    err /= float(imageA.shape[0] * imageA.shape[1])
+    return err
+
+def compare_images(imageA, imageB):
+    # 计算 PSNR
+    mse_value = mse(imageA, imageB)
+    if mse_value == 0:
+        return float('inf')
+    PIXEL_MAX = 255.0
+    return 20 * math.log10(PIXEL_MAX / math.sqrt(mse_value))
+
+if __name__ == 'main':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--image1', required=True, help='Path to the first image')
+    parser.add_argument('--image2', required=True, help='Path to the second image')
+    args = parser.parse_args()
+
+    # 加载图像
+    image1 = Image.open(args.image1)
+    image2 = Image.open(args.image2)
+
+    # 确保两张图片大小相同
+    if image1.size != image2.size:
+        print("Images must have the same dimensions.")
+        exit()
+
+    # 转换图像为 NumPy 数组
+    image1 = np.array(image1)
+    image2 = np.array(image2)
+
+    # 计算 PSNR
+    psnr_value = compare_images(image1, image2)
+    print(f"PSNR value is {psnr_value} dB")
+
+
